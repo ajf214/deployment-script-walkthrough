@@ -52,7 +52,8 @@
     "outputs": {
       "vNetAddressSpace" : {
         "type" : "string",
-        "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))).addressSpace.addressPrefixes[0]]"
+        "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', 
+            parameters('vnetName'))).addressSpace.addressPrefixes[0]]"
       }
     }
   }

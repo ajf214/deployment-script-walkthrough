@@ -30,6 +30,8 @@
                 "script": {
                     "type": "PowerShell",
                     "azVersion": "1.7.0",
+                    // I think the multi-line example really emphasizes that we also need a contentUri property
+                    // would be great to do something like embedFile(), but probably not for an MVP
                     "content": "
                         $apiKey = $someSecret
 
