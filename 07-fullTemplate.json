@@ -1,0 +1,70 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "scriptName",
+            "type": "Microsoft.Deployments/deploymentScripts",
+            "apiVersion": "2019-06-01",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "/subscriptions/996a2f3f-ee01-4ffd-9765-d2c3fc98f30a/resourceGroups/scriptRG/providers/
+                    Microsoft.ManagedIdentity/userAssignedIdentities/identity1": {}
+                }
+            },
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "script": {
+                    "type": "PowerShell",
+                    "azVersion": "1.7.0",
+                    "content": "
+                        $apiKey = $someSecret
+
+                        # do operation to get address prefix
+                        $Cred = Get-Credential # not sure how this works
+                        $Url = 'https://server.contoso.com:8089/new-ip-range' # can't use double quotes with inline script..
+                        $Body = @{}
+
+                        $result = Invoke-RestMethod -Method 'Post' -Uri $url -Credential $Cred -Body $body
+
+                        $addressPrefix = $result.newAddressRange
+                        $subnetPrefix = $result.newSubnetRange
+
+                        Add-ScriptOutput('addressRange', $addressPrefix) # (outputName, outputValue)
+                        Add-ScriptOutput('subnetRange', $subnetPrefix)
+                    " 
+                    // formattter massively messes up the multi-lines...
+                }
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('vnetName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[reference('scriptName').scriptResults.outputs.addressPrefix]" // need the reference to the deploymentScript output
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[concat(parameters('vnetName'), '-subnet001')]",
+                        "properties": {
+                            "addressPrefix": "[reference('scriptName').scriptResults.outputs.subnetPrefix]"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
