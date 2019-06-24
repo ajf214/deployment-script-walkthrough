@@ -1,4 +1,6 @@
 {
+    // latest root schema is not yet supported...
+    // (https://raw.githubusercontent.com/Azure/azure-resource-manager-schemas/master/schemas/2019-04-01/deploymentTemplate.json)
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
@@ -53,7 +55,7 @@
       "vNetAddressSpace" : {
         "type" : "string",
         "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', 
-            parameters('vnetName'))).addressSpace.addressPrefixes[0]]"
+        parameters('vnetName'))).addressSpace.addressPrefixes[0]]"
       }
     }
   }
