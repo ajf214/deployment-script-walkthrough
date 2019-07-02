@@ -12,7 +12,7 @@
             "type": "string"
         },
         "apiKey": {
-            "type": "securestring" // switch this to a keyvault example
+            "type": "securestring" // switch this to a keyvault reference?
         },
         "uamiSub": {
             "type": "string"
@@ -61,13 +61,14 @@
                         Add-ScriptOutput('addressRange', $addressPrefix) # (outputName, outputValue)
                         Add-ScriptOutput('subnetRange', $subnetPrefix)
                     ", // code formatting severely messes up the above script...
-                    "someSecureThing": [
+                    "secrets": [
                         {
+                          // open item - need a property to set name of ENV variable
                           "name": "apiKey",
+                          // known pattern for this...
                           "secureValue": "[parameters('apiKey')]"
                         }
                     ]
-                    // what is the right way to pass a secret as an argument to the script?
                 }
             }
         },
