@@ -4,6 +4,15 @@
     "parameters": {
         "vnetName": {
             "type": "string"
+        },
+        "uamiSub": {
+            "type": "string"
+        },
+        "uamiRg": {
+            "type": "string"
+        },
+        "uamiName": {
+            "type": "string"
         }
     },
     "variables": {},
@@ -15,8 +24,7 @@
             "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                    "/subscriptions/996a2f3f-ee01-4ffd-9765-d2c3fc98f30a/resourceGroups/scriptRG/providers/
-                    Microsoft.ManagedIdentity/userAssignedIdentities/identity1": {}
+                    "[resourceId(parameters('uamiSub'), parameters('uamiRg'), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('uamiName'))]" : {}
                 }
             },
             "location": "[resourceGroup().location]",
@@ -25,7 +33,9 @@
                     "type": "PowerShell",
                     "azVersion": "1.7.0",
                     "content": "
-                        $apiKey = $someSecret
+                        param(
+                            [Parameter]$apiKey = $env:SECRET_APIKEY  
+                        )
 
                         # do operation to get address prefix
                         $Cred = Get-Credential # not sure how this works
@@ -52,14 +62,14 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[reference('scriptName').scriptResults.outputs.addressPrefix]" // need the reference to the deploymentScript output
+                        "[reference('scriptName').outputs.addressPrefix]" // need the reference to the deploymentScript output
                     ]
                 },
                 "subnets": [
                     {
                         "name": "[concat(parameters('vnetName'), '-subnet001')]",
                         "properties": {
-                            "addressPrefix": "[reference('scriptName').scriptResults.outputs.subnetPrefix]"
+                            "addressPrefix": "[reference('scriptName').outputs.subnetPrefix]"
                         }
                     }
                 ]

@@ -1,18 +1,40 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "uamiSub": {
+            "type": "string"
+        },
+        "uamiRg": {
+            "type": "string"
+        },
+        "uamiName": {
+            "type": "string"
+        }
+        /*
+        "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "/subscriptions/<subscription-id>/resourceGroups/<rg-name>/providers/Microsoft.KeyVault/vaults/<vault-name>"
+              },
+              "secretName": "ExamplePassword"
+            }
+        }
+        */
+    },
     "variables": {},
     "resources": [
         {
             "name": "scriptName",
+            // rp name is flexible
             "type": "Microsoft.Deployments/deploymentScripts",
             "apiVersion": "2019-06-01",
-            "identity":{  
+            "identity": {
                 "type":"UserAssigned",
                 "userAssignedIdentities": {
                     // need userassignedidentity resource id - learn more at https://aka.ms/deploymentscripts
-                    "/subscriptions/996a2f3f-ee01-4ffd-9765-d2c3fc98f30a/resourceGroups/scriptRG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/identity1" : {}
+                    // alternatively can create UAMI and assign permissions within this same template
+                    "[resourceId(parameters('uamiSub'), parameters('uamiRg'), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('uamiName'))]" : {}
                 }
             },
             "location": "[resourceGroup().location]",
@@ -20,7 +42,7 @@
                 "script": {
                     "type": "PowerShell",
                     "azVersion": "1.7.0",
-                    "content": "Get-AzResourceGroup"
+                    "content": "Get-AzResourceGroup" // we will also support contentUri
                 }
             }
         }

@@ -10,6 +10,18 @@
         },
         "subnetRange": {
             "type": "string"
+        },
+        "apiKey": {
+            "type": "securestring" // switch this to a keyvault example
+        },
+        "uamiSub": {
+            "type": "string"
+        },
+        "uamiRg": {
+            "type": "string"
+        },
+        "uamiName": {
+            "type": "string"
         }
     },
     "variables": {},
@@ -21,8 +33,7 @@
             "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                    "/subscriptions/996a2f3f-ee01-4ffd-9765-d2c3fc98f30a/resourceGroups/scriptRG/providers/
-                    Microsoft.ManagedIdentity/userAssignedIdentities/identity1": {}
+                    "[resourceId(parameters('uamiSub'), parameters('uamiRg'), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('uamiName'))]" : {}
                 }
             },
             "location": "[resourceGroup().location]",
@@ -33,7 +44,9 @@
                     // I think the multi-line example really emphasizes that we also need a contentUri property
                     // would be great to do something like embedFile(), but probably not for an MVP
                     "content": "
-                        $apiKey = $someSecret
+                        param (
+                            [Parameter]$apiKey = $env:SECRET_APIKEY  
+                        )
 
                         # do operation to get address prefix
                         $Cred = Get-Credential # not sure how this works
@@ -47,8 +60,14 @@
 
                         Add-ScriptOutput('addressRange', $addressPrefix) # (outputName, outputValue)
                         Add-ScriptOutput('subnetRange', $subnetPrefix)
-                    " 
-                    // formattter massively messes up the multi-lines...
+                    ", // code formatting severely messes up the above script...
+                    "someSecureThing": [
+                        {
+                          "name": "apiKey",
+                          "secureValue": "[parameters('apiKey')]"
+                        }
+                    ]
+                    // what is the right way to pass a secret as an argument to the script?
                 }
             }
         },
